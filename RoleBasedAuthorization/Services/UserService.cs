@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using RoleBasedAuthorization.Halpers;
+using RoleBasedAuthorization.Helpers;
 using RoleBasedAuthorization.Interfaces;
 using RoleBasedAuthorization.Models;
 using System.IdentityModel.Tokens.Jwt;
@@ -37,17 +37,17 @@ namespace RoleBasedAuthorization.Services
             // authentication successful so generate jwt token
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-            var tokenDescritor = new SecurityTokenDescriptor
+            var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.Id.ToString()),
-                    new Claim(ClaimTypes.Role, user.Role)
+            new Claim(ClaimTypes.Name, user.Id.ToString()),
+            new Claim(ClaimTypes.Role, user.Role)
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
-            var token = tokenHandler.CreateToken(tokenDescritor);
+            var token = tokenHandler.CreateToken(tokenDescriptor);
             user.Token = tokenHandler.WriteToken(token);
 
             // remove password
@@ -58,7 +58,6 @@ namespace RoleBasedAuthorization.Services
 
         public IEnumerable<User> GetAll()
         {
-            // return users without passwords
             return _users.Select(x =>
             {
                 x.Password = null;
@@ -69,12 +68,7 @@ namespace RoleBasedAuthorization.Services
         public User GetById(int id)
         {
             var user = _users.FirstOrDefault(x => x.Id == id);
-
-            if (user != null)
-            {
-                user.Password = null;
-            }
-
+            if (user != null) user.Password = null;
             return user;
         }
     }

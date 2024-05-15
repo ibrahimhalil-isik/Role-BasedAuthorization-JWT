@@ -1,4 +1,4 @@
-﻿namespace RoleBasedAuthorization.Halpers
+﻿namespace RoleBasedAuthorization.Helpers
 {
     public class AppSettings
     {
